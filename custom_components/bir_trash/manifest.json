@@ -1,0 +1,10 @@
+{
+  "domain": "bir_trash",
+  "name": "BIR Trash Collection",
+  "codeowners": ["@eirikgrindevoll"],
+  "config_flow": true,
+  "documentation": "https://github.com/eirikgrindevoll/ha-bir-trash",
+  "iot_class": "cloud_polling",
+  "requirements": ["birtrashclient==0.1.0"],
+  "version": "0.1.0"
+}

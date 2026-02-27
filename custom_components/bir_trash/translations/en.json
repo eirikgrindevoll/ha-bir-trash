@@ -1,0 +1,31 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "BIR Trash Collection",
+        "description": "Enter your BIR API credentials and the address to look up.",
+        "data": {
+          "app_id": "App ID",
+          "contractor_id": "Contractor ID",
+          "address": "Address"
+        }
+      },
+      "select_address": {
+        "title": "Select Address",
+        "description": "Multiple properties found. Please select one.",
+        "data": {
+          "address": "Address"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect to the BIR API. Check your credentials and try again.",
+      "invalid_auth": "Invalid App ID or Contractor ID.",
+      "no_addresses_found": "No properties found for the given address.",
+      "unknown": "Unexpected error occurred."
+    },
+    "abort": {
+      "already_configured": "This address is already configured."
+    }
+  }
+}
