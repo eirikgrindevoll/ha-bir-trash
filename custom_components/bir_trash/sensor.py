@@ -29,17 +29,27 @@ async def async_setup_entry(
     address_id = entry.data[CONF_ADDRESS_ID]
     address = entry.data[CONF_ADDRESS]
 
-    # Collect one entry per fraction to determine which sensors to create
-    fractions: dict[str, str] = {}  # fraksjonId -> fraksjon name
-    for item in coordinator.data or []:
-        fid = item["fraksjonId"]
-        if fid not in fractions:
-            fractions[fid] = item["fraksjon"]
+    known_fractions: set[str] = set()
 
-    async_add_entities(
-        BirTrashSensor(coordinator, address_id, address, fid, name)
-        for fid, name in fractions.items()
-    )
+    def _add_new_fraction_sensors() -> None:
+        """Create sensors for any fractions not yet tracked."""
+        new_entities = []
+        for item in coordinator.data or []:
+            fid = item["fraksjonId"]
+            if fid not in known_fractions:
+                known_fractions.add(fid)
+                new_entities.append(
+                    BirTrashSensor(
+                        coordinator, address_id, address, fid, item["fraksjon"]
+                    )
+                )
+        if new_entities:
+            async_add_entities(new_entities)
+
+    # Create sensors for fractions present now, and re-check on every update
+    # so fractions added later by BIR automatically get a sensor.
+    _add_new_fraction_sensors()
+    entry.async_on_unload(coordinator.async_add_listener(_add_new_fraction_sensors))
 
 
 class BirTrashSensor(CoordinatorEntity[BirTrashCoordinator], SensorEntity):
