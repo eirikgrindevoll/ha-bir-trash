@@ -7,7 +7,7 @@ from homeassistant.core import HomeAssistant
 
 from .coordinator import BirTrashCoordinator
 
-PLATFORMS = ["sensor"]
+PLATFORMS = ["sensor", "calendar"]
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
