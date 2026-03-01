@@ -1,0 +1,33 @@
+name: Validate
+
+on:
+  push:
+    branches: [master, beta, dev]
+  pull_request:
+    branches: [master, beta, dev]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate JSON files
+        run: |
+          for f in hacs.json custom_components/bir_trash/manifest.json custom_components/bir_trash/translations/en.json; do
+            python3 -m json.tool "$f" > /dev/null && echo "$f OK"
+          done
+
+      - name: Check manifest fields
+        run: |
+          python3 - <<'EOF'
+          import json, sys
+          with open("custom_components/bir_trash/manifest.json") as f:
+              m = json.load(f)
+          required = ["domain", "name", "version", "requirements", "config_flow", "iot_class"]
+          missing = [k for k in required if k not in m]
+          if missing:
+              print(f"Missing manifest fields: {missing}")
+              sys.exit(1)
+          print("Manifest OK")
+          EOF

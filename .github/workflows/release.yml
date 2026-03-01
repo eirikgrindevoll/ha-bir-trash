@@ -1,0 +1,21 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  mark-prerelease:
+    runs-on: ubuntu-latest
+    if: |
+      github.event.release.target_commitish == 'dev' ||
+      github.event.release.target_commitish == 'beta'
+    permissions:
+      contents: write
+    steps:
+      - name: Mark as pre-release
+        run: |
+          gh release edit "${{ github.event.release.tag_name }}" --prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
