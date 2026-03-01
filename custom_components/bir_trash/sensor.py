@@ -18,6 +18,8 @@ from .coordinator import BirTrashCoordinator
 
 _LOGGER = logging.getLogger(__name__)
 
+PARALLEL_UPDATES = 0
+
 
 async def async_setup_entry(
     hass: HomeAssistant,
@@ -56,6 +58,7 @@ class BirTrashSensor(CoordinatorEntity[BirTrashCoordinator], SensorEntity):
     """Sensor representing a single BIR waste fraction."""
 
     _attr_device_class = SensorDeviceClass.DATE
+    _attr_has_entity_name = True
 
     def __init__(
         self,
@@ -70,7 +73,7 @@ class BirTrashSensor(CoordinatorEntity[BirTrashCoordinator], SensorEntity):
         self._address_id = address_id
         self._fraction_id = fraction_id
         self._attr_unique_id = f"{address_id}_{fraction_id}"
-        self._attr_name = f"BIR {fraction_name}"
+        self._attr_name = fraction_name
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, address_id)},
             name=address,

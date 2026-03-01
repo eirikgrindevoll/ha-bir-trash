@@ -37,8 +37,15 @@ Each sensor:
 2. Search for **BIR Trash Collection**
 3. Fill in the form:
    - **App ID** and **Contractor ID** are pre-filled with the BIR defaults — leave them as-is
-   - **Address**: type your street address (e.g. `Vindharpevegen 46 J`)
+   - **Address**: type your street address (e.g. `Storgata 1`)
 4. If multiple properties match, select yours from the list
+
+## Removal
+
+1. Go to **Settings → Devices & Services**
+2. Find **BIR Trash Collection** and click **⋮ → Delete**
+3. Restart Home Assistant
+4. Optionally remove `custom_components/bir_trash/` from your `config/` directory
 
 ## Requirements
 
