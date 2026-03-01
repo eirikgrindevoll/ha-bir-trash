@@ -1,21 +1,61 @@
 name: Release
 
 on:
-  release:
-    types: [published]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version (e.g. 0.1.3, 0.1.3b1, 0.1.3.dev1)"
+        required: true
+      branch:
+        description: "Branch to release from"
+        required: true
+        default: "master"
+        type: choice
+        options:
+          - master
+          - beta
+          - dev
 
 jobs:
-  mark-prerelease:
+  release:
     runs-on: ubuntu-latest
-    if: |
-      github.event.release.target_commitish == 'dev' ||
-      github.event.release.target_commitish == 'beta'
     permissions:
       contents: write
     steps:
-      - name: Mark as pre-release
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.branch }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update manifest version
         run: |
-          gh release edit "${{ github.event.release.tag_name }}" --prerelease
+          python3 -c "
+          import json
+          with open('custom_components/bir_trash/manifest.json') as f:
+              m = json.load(f)
+          m['version'] = '${{ inputs.version }}'
+          with open('custom_components/bir_trash/manifest.json', 'w') as f:
+              json.dump(m, f, indent=2)
+              f.write('\n')
+          "
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add custom_components/bir_trash/manifest.json
+          git commit -m "Bump version to ${{ inputs.version }}"
+          git push
+
+      - name: Create release
+        run: |
+          PRERELEASE=""
+          if [[ "${{ inputs.branch }}" == "dev" || "${{ inputs.branch }}" == "beta" ]]; then
+            PRERELEASE="--prerelease"
+          fi
+          gh release create "v${{ inputs.version }}" \
+            --title "v${{ inputs.version }}" \
+            --target "${{ inputs.branch }}" \
+            $PRERELEASE
         env:
           GH_TOKEN: ${{ github.token }}
-          GH_REPO: ${{ github.repository }}
