@@ -38,13 +38,26 @@ jobs:
             git merge origin/beta --no-edit
           fi
 
+      - name: Resolve full version
+        id: ver
+        run: |
+          BASE="${{ inputs.version }}"
+          if [[ "${{ inputs.branch }}" == "dev" ]]; then
+            FULL="${BASE}.dev1"
+          elif [[ "${{ inputs.branch }}" == "beta" ]]; then
+            FULL="${BASE}b1"
+          else
+            FULL="${BASE}"
+          fi
+          echo "full=$FULL" >> "$GITHUB_OUTPUT"
+
       - name: Update manifest version
         run: |
           python3 -c "
           import json
           with open('custom_components/bir_trash/manifest.json') as f:
               m = json.load(f)
-          m['version'] = '${{ inputs.version }}'
+          m['version'] = '${{ steps.ver.outputs.full }}'
           with open('custom_components/bir_trash/manifest.json', 'w') as f:
               json.dump(m, f, indent=2)
               f.write('\n')
@@ -53,7 +66,7 @@ jobs:
       - name: Commit and push
         run: |
           git add custom_components/bir_trash/manifest.json
-          git diff --cached --quiet || git commit -m "Bump version to ${{ inputs.version }}"
+          git diff --cached --quiet || git commit -m "Bump version to ${{ steps.ver.outputs.full }}"
           git push
 
       - name: Create release
@@ -62,8 +75,8 @@ jobs:
           if [[ "${{ inputs.branch }}" == "dev" || "${{ inputs.branch }}" == "beta" ]]; then
             PRERELEASE="--prerelease"
           fi
-          gh release create "v${{ inputs.version }}" \
-            --title "v${{ inputs.version }}" \
+          gh release create "v${{ steps.ver.outputs.full }}" \
+            --title "v${{ steps.ver.outputs.full }}" \
             --target "${{ inputs.branch }}" \
             $PRERELEASE
         env:
