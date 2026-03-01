@@ -51,3 +51,23 @@ Each sensor:
 
 - Home Assistant 2024.1 or newer
 - A valid BIR service address in the Bergen region
+
+## Development
+
+This integration depends on the [`birtrashclient`](https://github.com/eirikgrindevoll/birtrashclient) PyPI package.
+The pinned version is set in `custom_components/bir_trash/manifest.json`:
+
+```json
+"requirements": ["birtrashclient==0.1.4"]
+```
+
+**When to update the pinned version:**
+
+- A new stable `birtrashclient` release is published to PyPI
+- Update the version in `manifest.json` on the `dev` branch before releasing a new version of this integration
+- The release workflow (`release.yml`) will then merge `dev → beta → master` automatically, so the change propagates to all branches
+
+**Release flow:** `dev → beta → master`
+
+Releases are triggered manually via GitHub Actions → **Release** workflow (or `gh workflow run`).
+Pre-releases (`dev`/`beta` branches) are only visible to users who opt in to pre-releases in HACS.
