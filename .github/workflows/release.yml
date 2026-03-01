@@ -53,7 +53,7 @@ jobs:
       - name: Commit and push
         run: |
           git add custom_components/bir_trash/manifest.json
-          git commit -m "Bump version to ${{ inputs.version }}"
+          git diff --cached --quiet || git commit -m "Bump version to ${{ inputs.version }}"
           git push
 
       - name: Create release
